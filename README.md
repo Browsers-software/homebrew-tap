@@ -1,2 +1,3 @@
 # homebrew-tap
-Homebrew tap to install Browsers
+
+Browsers [Homebrew tap](https://docs.brew.sh/Taps) listing the products that can be installed using Homebrew.
