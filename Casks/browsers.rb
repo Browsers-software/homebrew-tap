@@ -15,6 +15,8 @@ cask "browsers" do
 
   app "Browsers.app"
 
+  uninstall quit: "software.Browsers"
+
   zap trash: [
     "~/Library/Application Support/software.Browsers",
     "~/Library/Caches/software.Browsers",
