@@ -1,0 +1,71 @@
+name: Update cask
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+jobs:
+  update-cask:
+    runs-on: macos-13
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Check for new app version
+        run: |
+          # Install current version
+          brew install --cask browsers-software/tap/browsers
+          #brew install --cask Casks/browsers.rb
+
+          # [
+          #  {
+          #    "cask": "browsers-software/tap/browsers",
+          #    "version": {
+          #      "current": "0.3.5",
+          #      "latest": "0.3.6",
+          #      "outdated": true,
+          #      "newer_than_upstream": false
+          #    }
+          #  }
+          # ]
+          # Find latest version
+          newer_version="$(brew livecheck --cask --quiet --newer-only --full-name --json --tap Browsers-software/tap Browsers-software/tap/browsers | jq -r '.[0].version.latest')"
+
+          if [[ $newer_version = null ]]; then
+            echo "Already latest. Not updating"
+            exit 1;
+          fi
+          
+          # Pass version to next step, 
+          # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+          echo "new_version=$newer_version" >> "$GITHUB_ENV"
+        shell: bash
+      - name: "Fetch sha256 of the new app package"
+        run: |
+          latest_version="${{ env.new_version }}"
+          # Store sha256
+          curl -LsS "https://github.com/Browsers-software/browsers/releases/download/${latest_version}/browsers_mac.tar.gz.sha256" -o file.sha256
+          latest_sha256=$(head -n 1 file.sha256)
+          echo "new_sha256=$latest_sha256" >> "$GITHUB_ENV"
+      - name: "Update local cask file to ${{ env.new_version }}"
+        run: |
+          latest_version="${{ env.new_version }}"
+          latest_sha256="${{ env.new_sha256 }}"
+          
+          # Update version and sha256 in mac file
+          sed -i'' -E "s/version \".*\"/version \"$latest_version\"/g" Casks/browsers.rb
+          sed -i'' -E "s/sha256 \".*\"/sha256 \"$latest_sha256\"/g" Casks/browsers.rb
+          
+          cat Casks/browsers.rb
+        shell: bash
+      - name: "Push new version ${{ env.new_version }}"
+        run: |
+          git config --global user.name 'release-bot'
+          git config --global user.email 'github-actions@github.com'
+          git add Casks/browsers.rb
+          git --no-pager diff --staged
+          git commit -m "Update version to ${{ env.new_version }}"
+          git --no-pager diff HEAD^
+          git push
+        shell: bash
