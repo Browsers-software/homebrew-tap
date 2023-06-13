@@ -34,14 +34,14 @@ jobs:
 
           if [[ $newer_version = null ]]; then
             echo "Already latest. Not updating"
-            exit 1;
+          else
+            # Pass version to next step, 
+            # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
+            echo "new_version=$newer_version" >> "$GITHUB_ENV"
           fi
-          
-          # Pass version to next step, 
-          # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
-          echo "new_version=$newer_version" >> "$GITHUB_ENV"
         shell: bash
       - name: "Fetch sha256 of the new app package"
+        if: env.new_version
         run: |
           latest_version="${{ env.new_version }}"
           # Store sha256
@@ -49,6 +49,7 @@ jobs:
           latest_sha256=$(head -n 1 file.sha256)
           echo "new_sha256=$latest_sha256" >> "$GITHUB_ENV"
       - name: "Update local cask file to ${{ env.new_version }}"
+        if: env.new_version
         run: |
           latest_version="${{ env.new_version }}"
           latest_sha256="${{ env.new_sha256 }}"
@@ -60,6 +61,7 @@ jobs:
           cat Casks/browsers.rb
         shell: bash
       - name: "Push new version ${{ env.new_version }}"
+        if: env.new_version
         run: |
           git config --global user.name 'release-bot'
           git config --global user.email 'github-actions@github.com'
