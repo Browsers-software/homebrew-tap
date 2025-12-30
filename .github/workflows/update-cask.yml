@@ -8,7 +8,7 @@ permissions:
   contents: write
 jobs:
   update-cask:
-    runs-on: macos-13
+    runs-on: macos-15
     steps:
       - name: Check out repository code
         uses: actions/checkout@v5
