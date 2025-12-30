@@ -11,7 +11,7 @@ jobs:
     runs-on: macos-15
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Check for new app version
         run: |
           # Install current version
