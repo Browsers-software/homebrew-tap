@@ -5,8 +5,7 @@ cask "browsers" do
   version "0.7.5"
   sha256 "60e461cbc3b509f29335036a5219f0fee257506feed6858f18397a64e960bf5e"
 
-  url "https://github.com/Browsers-software/browsers/releases/download/#{version}/browsers_mac.tar.gz",
-      verified: "github.com/Browsers-software/browsers/"
+  url "https://github.com/Browsers-software/browsers/releases/download/#{version}/browsers_mac.tar.gz"
   name "Browsers"
   desc "Open the right browser at the right time"
   homepage "https://browsers.software/"
