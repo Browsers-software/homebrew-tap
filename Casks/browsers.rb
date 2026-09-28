@@ -11,10 +11,7 @@ cask "browsers" do
   desc "Open the right browser at the right time"
   homepage "https://browsers.software/"
 
-  # See https://docs.brew.sh/Support-Tiers#future-macos-support
-  # and https://github.com/Homebrew/brew/blob/main/Library/Homebrew/macos_version.rb
-  # for minimum supported macOS version
-  depends_on macos: :catalina
+  depends_on :macos
 
   app "Browsers.app"
 
