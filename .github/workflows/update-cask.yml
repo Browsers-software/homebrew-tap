@@ -15,7 +15,8 @@ jobs:
       - name: Check for new app version
         run: |
           # Install current version
-          brew install --cask browsers-software/tap/browsers
+          # Non-fatal: a broken cask must not block its own repair
+          brew install --cask browsers-software/tap/browsers || echo "::warning::Installing current cask failed; continuing"
           #brew install --cask Casks/browsers.rb
 
           # [
@@ -42,11 +43,16 @@ jobs:
         shell: bash
       - name: "Fetch sha256 of the new app package"
         if: env.new_version
+        shell: bash
         run: |
           latest_version="${{ env.new_version }}"
           # Store sha256
-          curl -LsS "https://github.com/Browsers-software/browsers/releases/download/${latest_version}/browsers_mac.tar.gz.sha256" -o file.sha256
-          latest_sha256=$(head -n 1 file.sha256)
+          curl -fLsS "https://github.com/Browsers-software/browsers/releases/download/${latest_version}/browsers_mac.tar.gz.sha256" -o file.sha256
+          latest_sha256=$(head -n 1 file.sha256 | awk '{print $1}')
+          if [[ ! "$latest_sha256" =~ ^[0-9a-f]{64}$ ]]; then
+            echo "::error::Invalid sha256 for ${latest_version}: '$latest_sha256'"
+            exit 1
+          fi
           echo "new_sha256=$latest_sha256" >> "$GITHUB_ENV"
       - name: "Update local cask file to ${{ env.new_version }}"
         if: env.new_version
