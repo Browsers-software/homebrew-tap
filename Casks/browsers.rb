@@ -2,8 +2,8 @@
 # frozen_string_literal: true
 
 cask "browsers" do
-  version "0.8.3"
-  sha256 "fc7317d4f27a097c412629e4cec1c6555c8d732f016ac8f8b222b4ed3463092e"
+  version "0.8.5"
+  sha256 "ed63389762ec1dcfcaca11ee0576ab06b1ecf3db2ed6e8e840748481984a6bd2"
 
   url "https://github.com/Browsers-software/browsers/releases/download/#{version}/browsers_mac.tar.gz"
   name "Browsers"
